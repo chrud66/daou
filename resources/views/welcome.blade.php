@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Laravel</title>
+        <title>다우기술 기술면접</title>
 
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet">
@@ -48,18 +48,34 @@
                 font-size: 84px;
             }
 
+            .sub-title {
+                font-size: 42px;
+            }
+
             .links > a {
                 color: #636b6f;
                 padding: 0 25px;
                 font-size: 13px;
-                font-weight: 600;
                 letter-spacing: .1rem;
                 text-decoration: none;
                 text-transform: uppercase;
             }
 
+            .content > .links > a {
+                color: #636b6f;
+                padding: 10px 25px;
+                font-size: 21px;
+                font-weight: 600;
+                letter-spacing: .1rem;
+                text-decoration: none;
+                text-transform: uppercase;
+                background-color: #28a745;
+                border-radius: 5px;
+                color: #ffffff;
+            }
+
             .m-b-md {
-                margin-bottom: 30px;
+                margin-bottom: 60px;
             }
         </style>
     </head>
@@ -68,12 +84,23 @@
             @if (Route::has('login'))
                 <div class="top-right links">
                     @auth
-                        <a href="{{ url('/home') }}">Home</a>
+                        <a href="{{ url('/') }}">홈</a>
+
+                        <a class="dropdown-item" href="{{ route('logout') }}"
+                           onclick="event.preventDefault();
+                                                     document.getElementById('logout-form').submit();">
+                            로그아웃
+                        </a>
+
+
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                            @csrf
+                        </form>
                     @else
-                        <a href="{{ route('login') }}">Login</a>
+                        <a href="{{ route('login') }}">로그인</a>
 
                         @if (Route::has('register'))
-                            <a href="{{ route('register') }}">Register</a>
+                            <a href="{{ route('register') }}">회원가입</a>
                         @endif
                     @endauth
                 </div>
@@ -81,17 +108,15 @@
 
             <div class="content">
                 <div class="title m-b-md">
-                    Laravel
+                    다우기술 기술면접 사이트
+                </div>
+
+                <div class="sub-title m-b-md">
+                    게시판 [파일 업로드, 계층형 코멘트]
                 </div>
 
                 <div class="links">
-                    <a href="https://laravel.com/docs">Docs</a>
-                    <a href="https://laracasts.com">Laracasts</a>
-                    <a href="https://laravel-news.com">News</a>
-                    <a href="https://blog.laravel.com">Blog</a>
-                    <a href="https://nova.laravel.com">Nova</a>
-                    <a href="https://forge.laravel.com">Forge</a>
-                    <a href="https://github.com/laravel/laravel">GitHub</a>
+                    <a href="{{ route('boards.index') }}">게시판 바로가기</a>
                 </div>
             </div>
         </div>

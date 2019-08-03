@@ -21,6 +21,8 @@ class CreateBoardsTable extends Migration
             $table->timestamp('created_at')->nullable()->comment('작성일시');
             $table->timestamp('updated_at')->nullable()->comment('수정일시');
             // $table->timestamps();
+
+            $table->foreign('author_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

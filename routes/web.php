@@ -18,3 +18,9 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
+
+/* 게시판 */
+Route::resource('boards', 'BoardsController');
+
+/* 업로드 */
+Route::resource('board-upload', 'BoardFilesController')->only('store', 'destroy');

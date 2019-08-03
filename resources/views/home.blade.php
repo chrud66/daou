@@ -5,7 +5,7 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">Dashboard</div>
+                <div class="card-header">로그인 후 메인</div>
 
                 <div class="card-body">
                     @if (session('status'))
@@ -14,7 +14,9 @@
                         </div>
                     @endif
 
-                    You are logged in!
+                    <div class="text-center">
+                        <a class="btn btn-success" href="{{ url('/boards') }}">게시판 바로가기</a>
+                    </div>
                 </div>
             </div>
         </div>

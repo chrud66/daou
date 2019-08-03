@@ -36,4 +36,14 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function isAdmin()
+    {
+        return $this->is_admin === 1;
+    }
+
+    public function boards()
+    {
+        $this->hasMany(Board::class, 'author_id');
+    }
 }

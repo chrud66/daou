@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-class BoardsRequest extends Request
+class CommentsRequest extends Request
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,16 +23,8 @@ class BoardsRequest extends Request
     {
         if ($this->isDelete()) {
             $rules = [];
-        } elseif ($this->isUpdate()) {
-            $rules = [
-                'subject' => 'required|string|max:200',
-                'content' => 'required|string',
-            ];
         } else {
-            $rules = [
-                'subject' => 'required|string|max:200',
-                'content' => 'required|string',
-            ];
+            $rules = ['content' => 'required|string',];
         }
 
         return $rules;
@@ -41,8 +33,6 @@ class BoardsRequest extends Request
     public function messages()
     {
         return [
-            'subject.required'  => '제목을 입력하세요.',
-            'subject.max'       => '제목이 너무 깁니다.',
             'content.required'  => '내용을 입력하세요.',
         ];
     }

@@ -23,4 +23,10 @@ Route::get('/home', 'HomeController@index')->name('home');
 Route::resource('boards', 'BoardsController');
 
 /* 업로드 */
-Route::resource('board-upload', 'BoardFilesController')->only('store', 'destroy');
+Route::resource('boards/upload', 'BoardFilesController')->only('store', 'destroy');
+
+/* 파일 다운로드 */
+Route::get('boards/download/{id}', ['as' => 'boards.download', 'uses' => 'BoardFilesController@download']);
+
+/* 댓글 */
+Route::resource('boards/{id}/comments', 'CommentsController')->only('store', 'update', 'destroy');

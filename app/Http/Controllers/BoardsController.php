@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Board;
 use App\BoardFile;
+use App\Comment;
 use App\Http\Requests\BoardsRequest;
 use Auth;
+use Cache;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -25,9 +27,23 @@ class BoardsController extends Controller
      */
     public function index()
     {
-        $lists = Board::orderByDesc('created_at')->paginate(10);
-        $startNumber = ($lists->total() - $lists->perPage() * ($lists->currentPage()-1));
-        return view('boards.index', compact('lists', 'startNumber'));
+        $cacheKey = 'boards.index.' . urlencode(request()->fullUrl());
+
+        $query = Board::with('author')->withCount('comments');
+        if(request()->get('search')) {
+            $query->where('subject', 'like', '%'. request()->get('search').'%');
+        }
+
+        if(Cache::tags('boards')->has($cacheKey)) {
+            $boards = Cache::tags('boards')->get($cacheKey);
+        } else {
+            $boards = $query->orderByDesc('created_at')->paginate(10);
+            Cache::tags('boards')->put($cacheKey, $boards, 600);
+        }
+
+        $startNumber = ($boards->total() - $boards->perPage() * ($boards->currentPage()-1));
+
+        return view('boards.index', compact('boards', 'startNumber'));
     }
 
     /**
@@ -75,11 +91,27 @@ class BoardsController extends Controller
      */
     public function show($id)
     {
-        $board = Board::findOrFail($id);
+        $cacheKey = 'boards.show.' . urlencode(request()->fullUrl());
+        if(Cache::tags('show_board')->has($cacheKey)) {
+            $board = Cache::tags('show_board')->get($cacheKey);
+        } else {
+            $board = Board::with('files', 'author')->withCount('comments')->findOrFail($id);
+            Cache::tags('show_board')->put($cacheKey, $board, 600);
+        }
 
-        $boardFiles = $board->files()->orderBy('created_at')->get();
+        $cacheKey = 'boards.show.comments.' . urlencode(request()->fullUrl());
+        if(Cache::tags('show_comments')->has($cacheKey)) {
+            $comments = Cache::tags('show_comments')->get($cacheKey);
+        } else {
+            $comments = $board->comments()
+                ->leftJoin('users', 'comments.author_id', 'users.id')
+                ->select('comments.*', 'users.name')
+                ->whereNull('parent_id')
+                ->get();
+            Cache::tags('show_comments')->put($cacheKey, $comments, 600);
+        }
 
-        return view('boards.show', compact('board', 'boardFiles'));
+        return view('boards.show', compact('board', 'comments'));
     }
 
     /**
@@ -118,11 +150,13 @@ class BoardsController extends Controller
     {
         $this->authorize('update', $board);
 
-        //$board->update(Input::all());
         $board->update([
             'subject' => $request->input('subject'),
             'content' => $request->input('content'),
         ]);
+
+        Cache::tags('show_board')->flush();
+        Cache::tags('show_comments')->flush();
 
         return redirect(route('boards.show', ['id' => $board->id, 'page' => $request->get('page')]));
     }
@@ -149,7 +183,11 @@ class BoardsController extends Controller
             }
         }
 
+        $board->files()->delete();
+
         $board->delete();
+
+        Cache::flush();
 
         return redirect(route('boards.index', ['page' => $request->get('page')]));
     }

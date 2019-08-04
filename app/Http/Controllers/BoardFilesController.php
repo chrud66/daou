@@ -51,7 +51,7 @@ class BoardFilesController extends Controller
         $boardFile = BoardFile::findOrFail($id);
 
         $deletePath = public_path($this->savePath . $boardFile->save_name);
-        echo $deletePath . '<br/>';
+
         if(File::exists($deletePath)) {
             File::delete($deletePath);
         }
@@ -59,5 +59,17 @@ class BoardFilesController extends Controller
         $boardFile->delete();
 
         return response()->json(null, 204);
+    }
+
+    public function download($id)
+    {
+        $file = BoardFile::findOrFail($id);
+
+        $downloadPath = public_path($this->savePath . $file->save_name);
+        if(!File::exists($downloadPath)) {
+            abort(404);
+        }
+
+        return response()->download($downloadPath, $file->real_name);
     }
 }

@@ -16,7 +16,7 @@
 
 </div>
 
-<div class="form-group {{ $errors->has('content') ? 'has-error is-invalid' : '' }}">
+<div class="form-group">
     <label for="content">
         내용
     </label>
@@ -30,13 +30,13 @@
 </div>
 
 <div class="form-group">
-    <div id="my-dropzone" class="dropzone"></div>
+    <div id="my-dropzone" class="dropzone rounded"></div>
 </div>
 
 @section('script')
 <script src="{{ asset('js/dropzone/dropzone.js') }}"></script>
 <script>
-    var boardFiles = {!! isset($boardFiles) ? json_encode($boardFiles) : '{}'!!};
+    var boardFiles = JSON.parse('{!! isset($boardFiles) ? json_encode($boardFiles) : '{}'!!}');
 
     var form = $('form.form_board').first();
 
@@ -47,7 +47,7 @@
         uploadMultiple: false,
         parallelUploads: 1,
         addRemoveLinks: true,
-        url: '/board-upload',
+        url: '{{ url('/boards/upload') }}',
         params: {
             _token: '{{ csrf_token() }}',
             boardId: '{{ $board->id }}',
@@ -93,7 +93,7 @@
     myDropzone.on('removedfile', function (file) {
         $.ajax({
             type: 'POST',
-            url: '/board-upload/' + file.id,
+            url: '{{ url('/boards/upload') }}' + '/' + file.id,
             data: {
                 _method: 'DELETE',
                 _token: '{{ csrf_token() }}',

@@ -18,13 +18,7 @@
 
                     <div class="form-group">
                         <p class="text-center">
-                            <a href="{{ route('boards.create') }}" class="btn btn-dark m-2">
-                                초기화
-                            </a>
-
-                            <button type="submit" class="btn btn-primary m-2">
-                                저장하기
-                            </button>
+                            @include('boards.partial.button')
                         </p>
                     </div>
                 </form>

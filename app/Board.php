@@ -25,5 +25,10 @@ class Board extends Model
     public function files()
     {
         return $this->hasMany(BoardFile::class, 'board_id');
-    }    
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class,'board_id');
+    }
 }

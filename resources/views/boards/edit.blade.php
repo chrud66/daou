@@ -18,7 +18,7 @@
 
                     <div class="form-group">
                         <p class="text-center">
-                            @include('boards.partial.button)
+                            @include('boards.partial.button')
                         </p>
                     </div>
                 </form>

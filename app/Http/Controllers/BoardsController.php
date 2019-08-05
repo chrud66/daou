@@ -29,16 +29,15 @@ class BoardsController extends Controller
         $tag      = 'boards';
         $cacheKey = 'boards.index.' . urlencode(request()->fullUrl());
 
-        $query = Board::with('author')->withCount('comments');
-        if(request()->get('search')) {
-            $query->where('subject', 'like', '%'. request()->get('search').'%');
-        }
-
-        if($this->checkCash($tag, $cacheKey)) {
-            $boards = $this->getCash($tag, $cacheKey);
+        if(checkCash($tag, $cacheKey)) {
+            $boards = getCash($tag, $cacheKey);
         } else {
+            $query = Board::with('author')->withCount('comments');
+            if(request()->get('search')) {
+                $query->where('subject', 'like', '%'. request()->get('search').'%');
+            }
             $boards = $query->orderByDesc('created_at')->paginate(10);
-            $this->putCache($tag, $cacheKey, $boards, 600);
+            putCache($tag, $cacheKey, $boards, 600);
         }
 
         $startNumber = ($boards->total() - $boards->perPage() * ($boards->currentPage()-1));
@@ -80,7 +79,7 @@ class BoardsController extends Controller
             });
         }
 
-        $this->flushCache('boards');
+        flushCache('boards');
 
         return redirect(route('boards.show', $board->id));
     }
@@ -93,21 +92,21 @@ class BoardsController extends Controller
      */
     public function show($id)
     {
-        $tag        = 'show_board';
+        $tag        = 'board.show';
         $cacheKey   = 'boards.show.' . urlencode(request()->fullUrl());
 
-        if($this->checkCash($tag, $cacheKey)) {
-            $board = $this->getCash($tag, $cacheKey);
+        if(checkCash($tag, $cacheKey)) {
+            $board = getCash($tag, $cacheKey);
         } else {
             $board = Board::with('files', 'author')->withCount('comments')->findOrFail($id);
-            $this->putCache($tag, $cacheKey, $board, 600);
+            putCache($tag, $cacheKey, $board, 600);
         }
 
-        $tag        = 'show_comments';
+        $tag        = 'show.comments';
         $cacheKey   = 'boards.show.comments.' . urlencode(request()->fullUrl());
 
-        if($this->checkCash($tag, $cacheKey)) {
-            $comments = $this->getCash($tag, $cacheKey);
+        if(checkCash($tag, $cacheKey)) {
+            $comments = getCash($tag, $cacheKey);
         } else {
             $comments = $board->comments()
                 ->leftJoin('users', 'comments.author_id', 'users.id')
@@ -115,7 +114,8 @@ class BoardsController extends Controller
                 ->whereNull('parent_id')
                 ->withTrashed()
                 ->get();
-            $this->putCache($tag, $cacheKey, $comments, 600);
+
+            putCache($tag, $cacheKey, $comments, 600);
         }
 
         return view('boards.show', compact('board', 'comments'));
@@ -162,7 +162,7 @@ class BoardsController extends Controller
             'content' => $request->input('content'),
         ]);
 
-        $this->flushCache(['show_board', 'show_comments']);
+        flushCache(['board.show', 'show.comments']);
 
         $urlData = ['id' => $board->id, 'search' => $request->get('search'), 'page' => $request->get('page')];
         return redirect(route('boards.show', $urlData));
@@ -193,7 +193,7 @@ class BoardsController extends Controller
         $board->files()->delete();
         $board->delete();
 
-        $this->flushCache();
+        flushCache();
 
         return redirect(route('boards.index', ['page' => $request->get('page')]));
     }

@@ -30,21 +30,20 @@
     @endif
 
     @php
+        $tag = 'show.comments';
         $cacheKey = 'boards.show.comments.' . $comment->id . urlencode(request()->fullUrl());
-        if(Cache::tags('show_comments')->has($cacheKey)) {
-            $replys = Cache::tags('show_comments')->get($cacheKey);
+        if(checkCash($tag, $cacheKey)) {
+            $replys = getCash($tag, $cacheKey);
         } else {
             $replys = $comment->replies()
                 ->withTrashed()
                 ->leftJoin('users', 'comments.author_id', '=', 'users.id')
                 ->select('comments.*', 'users.name')
                 ->get();
-            Cache::tags('show_comments')->put($cacheKey, $replys, 600);
+
+            putCache($tag, $cacheKey, $replys, 600);
         }
         $child = count($replys);
-
-        //dd(Cache::tags('comments')->flush());
-
     @endphp
 
     @forelse ($replys as $reply)

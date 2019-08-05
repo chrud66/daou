@@ -32,7 +32,7 @@ class CommentsController extends Controller
 
         $comment = $board->comments()->with('author')->create($createData);
 
-        $this->flushCache('show_comments');
+        flushCache();
 
         return redirect()->to(url()->previous() . '#comment-' . $comment->id);
     }
@@ -52,7 +52,7 @@ class CommentsController extends Controller
 
         $comment->update(['content' => $request->input('content')]);
 
-        $this->flushCache('show_comments');
+        flushCache();
 
         return redirect()->to(url()->previous() . '#comment-' . $comment->id);
     }
@@ -62,20 +62,24 @@ class CommentsController extends Controller
         $this->authorize('delete', $comment);
 
         $comment->delete();
-        $this->flushCache('show_comments');
+        flushCache();
 
         return redirect()->to(url()->previous() . '#comment_wrap');
     }
 
-    public function forceDestroy(CommentsRequest $request, $id, Comment $comment)
+    public function forceDestroy(CommentsRequest $request, $id, $comment)
     {
+        $query = Comment::where('id', '=', $comment)->withTrashed();
+
+        $comment = $query->get();
+
         $this->authorize('delete', $comment);
         if(!Auth::user()->isAdmin()) {
             abort(403);
         }
 
-        $comment->forceDelete();
-        $this->flushCache('show_comments');
+        $query->forceDelete();
+        flushCache();
 
         return redirect()->to(url()->previous() . '#comment_wrap');
     }

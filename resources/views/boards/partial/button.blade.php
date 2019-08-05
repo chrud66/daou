@@ -4,7 +4,6 @@
     </a>
 @endif
 
-
 @if(Route::current()->getName() === 'boards.show' || Route::current()->getName() === 'boards.create' || Route::current()->getName() === 'boards.edit')
     <a href="{{ route('boards.index', request()->except('')) }}" class="btn btn-primary ml-auto">
         목록
@@ -23,7 +22,7 @@
     @endcan
 @endif
 
-@if(Route::current()->getName() === 'boards.create' || Route::current()->getName() === 'boards.edit')
+@if(!isset($isTopButton) && (Route::current()->getName() === 'boards.create' || Route::current()->getName() === 'boards.edit'))
     <a href="javascript:void(0)" onclick="window.location.reload()" class="btn btn-dark">
         초기화
     </a>

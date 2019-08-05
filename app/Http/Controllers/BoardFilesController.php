@@ -58,6 +58,8 @@ class BoardFilesController extends Controller
 
         $boardFile->delete();
 
+        flushCache(['board.show', 'show.comments']);
+
         return response()->json(null, 204);
     }
 

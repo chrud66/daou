@@ -24,11 +24,11 @@
 @endif
 
 @if(Route::current()->getName() === 'boards.create' || Route::current()->getName() === 'boards.edit')
-    <a href="javascript:void(0)" onclick="window.location.reload()" class="btn btn-dark m-2">
+    <a href="javascript:void(0)" onclick="window.location.reload()" class="btn btn-dark">
         초기화
     </a>
 
-    <button type="submit" class="btn btn-primary m-2">
+    <button type="submit" class="btn btn-primary">
         저장하기
     </button>
 @endif

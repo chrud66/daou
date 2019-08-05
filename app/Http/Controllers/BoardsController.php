@@ -80,6 +80,8 @@ class BoardsController extends Controller
             });
         }
 
+        Cache::tags('boards')->flush();
+
         return redirect(route('boards.show', $board->id));
     }
 

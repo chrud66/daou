@@ -1,4 +1,13 @@
 <div id="comment-{{ $comment->id }}" class="card text-white bg-dark border-white @if(!isset($hasChild)) mb-3 @else mb-2 ml-5 rounded-left border-right-0 @endif">
+    @if($comment->trashed())
+        <div class="card-body">
+            <p class="mb-0">삭제된 댓글입니다.</p>
+        </div>
+
+        <div class="card-footer text-muted text-right p-0  @if(isset($hasChild)) rounded-left border-right-0 @endif">
+            @include('boards.comments.partial.button')
+        </div>
+    @else
     <div class="card-header d-flex @if(isset($hasChild)) border-right-0 rounded-left @endif">
         <p class="mb-0">작성자 : {{ $comment->name }}</p>
         <p class="mb-0 ml-auto">작성일시 : {{ $comment->created_at }}</p>
@@ -18,13 +27,18 @@
             @include('boards.comments.partial.create', ['parentId' => $comment->id])
         @endauth
     </div>
+    @endif
 
     @php
         $cacheKey = 'boards.show.comments.' . $comment->id . urlencode(request()->fullUrl());
         if(Cache::tags('show_comments')->has($cacheKey)) {
             $replys = Cache::tags('show_comments')->get($cacheKey);
         } else {
-            $replys = $comment->replies()->leftJoin('users', 'comments.author_id', '=', 'users.id')->select('comments.*', 'users.name')->get();
+            $replys = $comment->replies()
+                ->withTrashed()
+                ->leftJoin('users', 'comments.author_id', '=', 'users.id')
+                ->select('comments.*', 'users.name')
+                ->get();
             Cache::tags('show_comments')->put($cacheKey, $replys, 600);
         }
         $child = count($replys);

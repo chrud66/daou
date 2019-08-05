@@ -30,3 +30,4 @@ Route::get('boards/download/{id}', ['as' => 'boards.download', 'uses' => 'BoardF
 
 /* 댓글 */
 Route::resource('boards/{id}/comments', 'CommentsController')->only('store', 'update', 'destroy');
+Route::delete('boards/{id}/comments/forceDestroy/{comment}', ['as' => 'comments.forceDestroy', 'uses' => 'CommentsController@forceDestroy']);

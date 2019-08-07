@@ -161,8 +161,7 @@ class BoardsController extends Controller
             'subject' => $request->input('subject'),
             'content' => $request->input('content'),
         ]);
-
-        flushCache(['board.show', 'show.comments']);
+        flushCache(['boards', 'board.show', 'show.comments']);
 
         $urlData = ['id' => $board->id, 'search' => $request->get('search'), 'page' => $request->get('page')];
         return redirect(route('boards.show', $urlData));
